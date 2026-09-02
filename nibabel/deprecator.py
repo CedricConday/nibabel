@@ -213,7 +213,8 @@ class Deprecator:
         if until:
             messages.append(
                 f'* {"Raises" if self.is_bad_version(until) else "Will raise"} '
-                f'{exception} as of version: {until}'
+                f':class:`~{exception.__module__}.{exception.__qualname__}` '
+                f'as of version: {until}'
             )
         message = '\n'.join(messages)
 
