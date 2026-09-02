@@ -13,7 +13,6 @@ from nibabel.deprecator import (
     Deprecator,
     ExpiredDeprecationError,
     _add_dep_doc,
-    _dedent_docstring,
     _ensure_cr,
 )
 
@@ -21,13 +20,16 @@ from ..testing import clear_and_catch_warnings
 
 _OWN_MODULE = sys.modules[__name__]
 
-func_docstring = (
-    f'A docstring\n   \n   foo\n   \n{indent(TESTSETUP, "   ", lambda x: True)}'
-    f'   Some text\n{indent(TESTCLEANUP, "   ", lambda x: True)}'
-)
+func_docstring = f"""A docstring
 
-if sys.version_info >= (3, 13):
-    func_docstring = _dedent_docstring(func_docstring)
+foo
+
+{TESTSETUP}Some text
+{TESTCLEANUP}"""
+
+if sys.version_info < (3, 13):
+    # Pre-3.13, docstrings were not auto-dedented, so reinject the indentation
+    func_docstring = indent(func_docstring, '    ', lambda text: text != 'A docstring\n')
 
 
 def test__ensure_cr():
@@ -76,7 +78,10 @@ def func_doc(i):
 
 
 def func_doc_long(i, j):
-    """A docstring\n\n   Some text"""
+    """A docstring
+
+    Some text
+    """
 
 
 class TestDeprecatorFunc:
